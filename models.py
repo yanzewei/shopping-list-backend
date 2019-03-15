@@ -49,7 +49,7 @@ class ProductSchema(ma.Schema):
     logo = fields.String()
     brand_name = fields.String()
     category = fields.Integer()
-    add_time = fields.Integer()
+    num = fields.Integer()
 
 #brand
 class Brand(db.Model):
