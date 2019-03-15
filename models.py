@@ -67,3 +67,14 @@ class User(db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password = db.Column(db.String(128))
+
+#shoplistCount sechema
+class ShoplistCount(ma.Schema):
+    uid = fields.Integer(required=True)
+    key = fields.String(required=True)
+    nums = fields.Integer(required=True)
+    remain_count = fields.Integer(required=True)
+
+class ShoplistKey(ma.Schema):
+    uid = fields.Integer(required=True)
+    key = fields.String(required=True)

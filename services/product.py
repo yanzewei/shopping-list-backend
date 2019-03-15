@@ -5,13 +5,7 @@ from models import *
 app = Flask(__name__)
 api = Api(app)
 product_schema = ProductSchema(many=True)
-'''
-        thanks = Thank.query\
-    .join(ThanksReceivedByUser)\
-    .filter(or_(Thank.giver_id == user.id, 
-                ThankReceivedByUser.receiver_id == user.id))\
-    .order_by(Thank.date_registered).all()
-'''
+
 class Product(Resource):
     def get(self, title=None):
         if title is None:
@@ -42,4 +36,3 @@ class Product(Resource):
         game_machine = product_schema.dump(game_machine_attributes).data
         return {'status': 'success', 'data': {'phone':phones, 'game machine':game_machine}}, 200
 
-api.add_resource(Product, '/')

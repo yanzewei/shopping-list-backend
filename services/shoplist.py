@@ -1,8 +1,11 @@
+from flask import request
 from flask_restful import Resource
 from redismodels import Shoplist as ShopCart
 from models import *
 
 product_schema = ProductSchema(many=True)
+shoplist_count_schema = ShoplistCount()
+shoplist_key_schema = ShoplistKey()
 class Shoplist(Resource):
     def get(self, uid):
         carts = ShopCart.get_by_uid(uid) 
@@ -40,7 +43,43 @@ class Shoplist(Resource):
         return {'status': 'success', 'data': result}, 200
 
     def post(self):
-        return {}
+        json_data = request.get_json(force=True)
+        if not json_data:
+               return {'message': 'No input data provided'}, 400
+        # Validate and deserialize input
+        data, errors = shoplist_count_schema.load(json_data)
+        if errors:
+            return errors, 422
+        exsits_count = ShopCart.get_count(data['uid'], data['key'])
+        counts = exsits_count + data['nums']
+        if  counts > data['remain_count']:
+            return {'message': 'Cannot add number of the item over the current stock:'+str(data['remain_count'])}, 400
+        else:
+            ShopCart.set_count(data['uid'], data['key'], counts)
+        return { "status": 'success'}, 201
 
     def put(self):
-        return {}
+        json_data = request.get_json(force=True)
+        if not json_data:
+               return {'message': 'No input data provided'}, 400
+        # Validate and deserialize input
+        data, errors = shoplist_count_schema.load(json_data)
+        if errors:
+            return errors, 422
+        if  data['nums'] > data['remain_count']:
+            return {'message': 'Cannot add number of the item over the current stock:'+str(data['remain_count'])}, 400
+        else:
+            ShopCart.set_count(data['uid'], data['key'], data['nums'])
+        return { "status": 'success'}, 204
+    
+    def delete(self):
+        json_data = request.get_json(force=True)
+        if not json_data:
+               return {'message': 'No input data provided'}, 400
+        # Validate and deserialize input
+        data, errors = shoplist_key_schema.load(json_data)
+        if errors:
+            return errors, 422
+        ShopCart.del_record(data['uid'], data['key'])
+        return { "status": 'success'}, 204
+
