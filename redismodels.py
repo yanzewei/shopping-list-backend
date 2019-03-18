@@ -2,9 +2,6 @@ from flask_redis import FlaskRedis
 from flask import Flask
 
 redis_store = FlaskRedis()
-app = Flask(__name__)
-app.config.from_object("config")
-redis_store.init_app(app, decode_responses=True)
 
 class Shoplist():
     @staticmethod
@@ -23,6 +20,16 @@ class Shoplist():
             return int(count)
         else:
             return 0
+    
+    @staticmethod
+    def get_quantity(uid):
+        hash_key = 'shopping_nums_u'+str(uid)
+        records = redis_store.hvals(hash_key)
+        quantity = 0
+        for num in records:
+            quantity += int(num)
+        return quantity
+
     @staticmethod
     def del_record(uid, field):
         hash_key = 'shopping_nums_u'+str(uid)

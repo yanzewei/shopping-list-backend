@@ -19,6 +19,9 @@ def create_app(config_filename):
     from models import db
     db.init_app(app)
 
+    from redismodels import redis_store
+    redis_store.init_app(app, decode_responses=True)
+
 
     return app
 
