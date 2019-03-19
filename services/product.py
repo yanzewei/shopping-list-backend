@@ -11,9 +11,9 @@ class Product(Resource):
         if title is None:
             filter_condition = CategoryMobilephone.brand_id==Brand.id
         else:
-            filter_condition = db.and_(Brand.name==title, CategoryMobilephone.brand_id==Brand.id)
-        phones = db.session.query(Brand, CategoryMobilephone).\
-            filter(filter_condition).order_by(db.text("add_time desc")).limit(20).all()
+            filter_condition = db.and_(Brand.name.like(title+"%"), CategoryMobilephone.brand_id==Brand.id)
+        phones = db.session.query(Brand, CategoryMobilephone).filter(
+            filter_condition).order_by(db.text("add_time desc")).limit(20).all()
         phone_attributes = []
         for temp in phones:
             temp[1].logo = temp[0].logo
@@ -24,7 +24,7 @@ class Product(Resource):
         if title is None:
             filter_condition = CategoryGameMachine.brand_id==Brand.id
         else:
-            filter_condition = db.and_(Brand.name==title, CategoryGameMachine.brand_id==Brand.id)
+            filter_condition = db.and_(Brand.name.like(title+"%"), CategoryGameMachine.brand_id==Brand.id)
         game_machine = db.session.query(Brand, CategoryGameMachine).\
             filter(filter_condition).order_by(db.text("add_time desc")).limit(20).all()
         game_machine_attributes = [] 
@@ -34,5 +34,10 @@ class Product(Resource):
             temp[1].category = temp[0].category
             game_machine_attributes.append(temp[1])
         game_machine = product_schema.dump(game_machine_attributes).data
-        return {'status': 'success', 'data': {'phone':phones, 'game machine':game_machine}}, 200
+        result = {}
+        if len(phones) > 0:
+            result['phones'] = phones
+        if len(game_machine) > 0:
+            result['game_machine'] = game_machine
+        return {'status': 'success', 'data': result}, 200
 

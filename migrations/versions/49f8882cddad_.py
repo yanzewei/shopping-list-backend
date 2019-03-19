@@ -149,6 +149,7 @@ def upgrade():
             category_game_machine,
             game_machine_arr
         )
+    op.create_index('part_of_name', 'brand', ['name'], mysql_length=5)
 
     # ### end Alembic commands ###
 
