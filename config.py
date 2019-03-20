@@ -26,7 +26,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('MYSQL_URL')
-    REDIS_URL = os.environ.get('TEST_REDIS_URL')
+    REDIS_URL = os.environ.get('REDIS_URL')
 
 config = {
     'development': DevelopmentConfig,
