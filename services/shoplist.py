@@ -82,7 +82,7 @@ class Shoplist(Resource):
             return {'message': 'Can not exceed the stock number'}, 400
         else:
             ShopCart.set_count(data['uid'], data['key'], data['nums'])
-        return { "status": 'success'}, 204
+        return { "status": 'success'}, 200
     
     def delete(self):
         json_data = request.get_json(force=True)
@@ -93,5 +93,5 @@ class Shoplist(Resource):
         if errors:
             return errors, 422
         ShopCart.del_record(data['uid'], data['key'])
-        return { "status": 'success'}, 204
+        return { "status": 'success'}, 200
 
