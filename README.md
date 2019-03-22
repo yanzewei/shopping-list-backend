@@ -8,7 +8,7 @@
 
 ## 📋 Requirements
 
-shopping-list-backend requires python3, pip3, python-dev.
+shopping-list-backend requires python3, pip3, python-dev, MySQL, Redis.
 
 ## 📖 Documentation
 
