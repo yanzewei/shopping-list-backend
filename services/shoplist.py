@@ -48,7 +48,7 @@ class Shoplist(Resource):
     def update(self, method):
         json_data = request.get_json(force=True)
         if not json_data:
-               return {'message': 'No input data provided'}, 400
+            return {'message': 'No input data provided'}, 400
         # Validate and deserialize input
         shoplist_count_schema = ShoplistCount()
         data, errors = shoplist_count_schema.load(json_data)
