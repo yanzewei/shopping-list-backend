@@ -46,13 +46,13 @@ Enter the root directory. Run the command: `source boot.sh`
 You can modify the boot.sh according to your practical needs. Like change the port or run it without gunicorn.
 ```
 #!/bin/sh
-python -m venv venv
+python3 -m venv venv
 
 source venv/bin/activate
 
-pip install -r requirements/requirements.txt
+pip3 install -r requirements/requirements.txt
 
-python migrate.py db upgrade
+python3 migrate.py db upgrade
 
 gunicorn -b :5000 --access-logfile - --error-logfile - run:app --daemon
 # can also be:
