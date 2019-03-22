@@ -39,7 +39,7 @@ FLASK_CONFIG=production
 MYSQL_URL="mysql://username:password@localhost/dbname"
 REDIS_URL="redis://:password@localhost:6379/0"
 ```
-
+You should create your db name first, the tables will automatically generate after running below bash.
 
 Enter the root directory. Run the command: `source boot.sh`
 
