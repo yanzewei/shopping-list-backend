@@ -3,11 +3,20 @@ from flask_restful import Resource
 from redismodels import Shoplist as ShopCart
 from models import *
 
-product_schema = ProductSchema(many=True)
-shoplist_count_schema = ShoplistCount()
-shoplist_key_schema = ShoplistKey()
+
 class Shoplist(Resource):
+    def dump_attributes(self, attributes_arr, query_result, id_num_pairs):
+        for temp in query_result:
+            if temp[1].id in id_num_pairs:
+                temp[1].logo = temp[0].logo
+                temp[1].brand_name = temp[0].name
+                temp[1].category = temp[0].category
+                temp[1].num = id_num_pairs[temp[1].id]
+                attributes_arr.append(temp[1])
+        return attributes_arr
+
     def get(self, uid):
+        product_schema = ProductSchema(many=True)
         carts = ShopCart.get_by_uid(uid) 
         phone_ids = {}
         game_machine_ids = {}
@@ -20,42 +29,36 @@ class Shoplist(Resource):
                     game_machine_ids[int(temp[1])] = int(num)
         result = []
         if len(phone_ids) > 0:
-            phones = db.session.query(Brand, CategoryMobilephone).\
-                filter(db.and_(CategoryMobilephone.brand_id==Brand.id,CategoryMobilephone.id.in_(phone_ids.keys()))).all()
-            phone_attributes = []
-            for temp in phones:
-                if temp[1].id in phone_ids:
-                    temp[1].logo = temp[0].logo
-                    temp[1].brand_name = temp[0].name
-                    temp[1].category = temp[0].category
-                    temp[1].num = phone_ids[temp[1].id]
-                    phone_attributes.append(temp[1])
+            phones = db.session.query(Brand, CategoryMobilephone).filter(
+                db.and_(
+                    CategoryMobilephone.brand_id==Brand.id,CategoryMobilephone.id.in_(phone_ids.keys())
+                )).all()
+            phone_attributes = self.dump_attributes([], phones, phone_ids)
             result = product_schema.dump(phone_attributes).data
 
         if len(game_machine_ids) > 0:
-            game_machine = db.session.query(Brand, CategoryGameMachine).\
-            filter(db.and_(CategoryGameMachine.brand_id==Brand.id,CategoryGameMachine.id.in_(game_machine_ids.keys()))).all()
-            game_machine_attributes = [] 
-            for temp in game_machine:
-                if temp[1].id in game_machine_ids:
-                    temp[1].logo = temp[0].logo
-                    temp[1].brand_name = temp[0].name
-                    temp[1].category = temp[0].category
-                    temp[1].num = game_machine_ids[temp[1].id]
-                    game_machine_attributes.append(temp[1])
+            game_machine = db.session.query(Brand, CategoryGameMachine).filter(
+                db.and_(
+                    CategoryGameMachine.brand_id==Brand.id,CategoryGameMachine.id.in_(game_machine_ids.keys())
+                )).all()
+            game_machine_attributes = self.dump_attributes([], game_machine, game_machine_ids)
             result = result + product_schema.dump(game_machine_attributes).data
         return {'status': 'success', 'data': result}, 200
 
-    def post(self):
+    def update(self, method):
         json_data = request.get_json(force=True)
         if not json_data:
                return {'message': 'No input data provided'}, 400
         # Validate and deserialize input
+        shoplist_count_schema = ShoplistCount()
         data, errors = shoplist_count_schema.load(json_data)
         if errors:
             return errors, 422
-        exsits_count = ShopCart.get_count(data['uid'], data['key'])
-        counts = int(exsits_count) +data['nums']
+        if method == 'post':
+            exsits_count = ShopCart.get_count(data['uid'], data['key'])
+            counts = int(exsits_count) +data['nums']
+        elif method == 'put':
+            counts = data['nums']
         if  data['nums'] < 0:
             return {'message': 'Cannot add number below zero'}, 400
         elif data['nums'] > 99:
@@ -66,29 +69,18 @@ class Shoplist(Resource):
             ShopCart.set_count(data['uid'], data['key'], counts)
         return { "status": 'success'}, 201
 
+    def post(self):
+        return self.update('post')
+
     def put(self):
-        json_data = request.get_json(force=True)
-        if not json_data:
-               return {'message': 'No input data provided'}, 400
-        # Validate and deserialize input
-        data, errors = shoplist_count_schema.load(json_data)
-        if errors:
-            return errors, 422
-        if  data['nums'] < 0:
-            return {'message': 'Cannot add number below zero'}, 400
-        elif data['nums'] > 99:
-            return {'message': 'The maximum limit is 99'}, 400
-        elif data['nums'] > data['remain_count']:
-            return {'message': 'Can not exceed the stock number'}, 400
-        else:
-            ShopCart.set_count(data['uid'], data['key'], data['nums'])
-        return { "status": 'success'}, 200
+        return self.update('put')
     
     def delete(self):
         json_data = request.get_json(force=True)
         if not json_data:
                return {'message': 'No input data provided'}, 400
         # Validate and deserialize input
+        shoplist_key_schema = ShoplistKey()
         data, errors = shoplist_key_schema.load(json_data)
         if errors:
             return errors, 422

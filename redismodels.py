@@ -7,7 +7,6 @@ class Shoplist():
     @staticmethod
     def get_by_uid(uid):
         return redis_store.hgetall('shopping_nums_u'+str(uid))
-        #print(redis_store.hget("shopping_nums_u1"))
     @staticmethod
     def set_count(uid, field, nums):
         hash_key = 'shopping_nums_u'+str(uid)
