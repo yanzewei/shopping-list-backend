@@ -9,7 +9,7 @@ pip install -r requirements/requirements.txt
 
 python3 migrate.py db upgrade
 
-gunicorn -b :5003 --access-logfile - --error-logfile - run:app
+gunicorn -b :5000 --access-logfile - --error-logfile - run:app --daemon
 # can also be:
 # gunicorn -b :5000 --access-logfile - --error-logfile - run:app
 # or
