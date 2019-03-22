@@ -3,7 +3,9 @@ python3 -m venv venv
 
 source venv/bin/activate
 
-pip3 install -r requirements/requirements.txt
+python3 -m pip install --upgrade pip
+
+pip install -r requirements/requirements.txt
 
 python3 migrate.py db upgrade
 
