@@ -12,3 +12,5 @@ services:
     image: "mysql/mysql-server:5.7"
     env_file: .env-mysql
     restart: always
+  redis:
+    image: redis
