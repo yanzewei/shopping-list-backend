@@ -22,7 +22,7 @@ The falsk related document can see the [flask](https://github.com/yanzewei/shopp
 
 Create the file named **.env** under the root directory. Because the environment variables of deployment and production are different, moreover,
 
-the production's database information is private, this file is ignored in git.
+the production's database information is private, this file should be ignored in git.
 
 The format should be like this:
 
